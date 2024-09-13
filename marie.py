@@ -1,62 +1,58 @@
-def bth(b):
-        v = int(b, 2)
-        hex_v = hex(v)[2:]
-        return hex_v.upper()
+"""
+Esse programa lê entradas de dados à partir do teclado.
 
-def marie_i(c):
-        if bth(c[0]) == "3": k = 'Add\n'
+O programa lê as entradas até que encontre a exceção de fim de arquivo (EOFError).
+Quando encontrar o fim de arquivo, o programa não irá ler o último caractere que foi fornecido de entrada,
+portanto este não poderá ser um caractere significativo para a interpretação do código binário.
 
-        elif bth(c[0]) ==  "B": k = 'AddI\n'
+Para entradas de dados que possuem quaisquer caracteres da parte de Latin Básico da tabela Unicode como 
+ruído para a entrada (mas que não adicione mais bits binários em relação à entrada sem ruído), o programa
+executará normalmente.
 
-        elif bth(c[0]) == "4": k = "Sub\n"
+Para entradas onde haja somente caracteres binários, sem qualquer quebras de linha, espaços em branco ou 
+caracteres de ruído, o programa executará normalmente.
+"""
 
-        elif bth(c[0]) == "9": k = "Jump\n"
 
-        elif bth(c[0]) == "C": k = "JumpI\n"
+mnemonicos = ["JnS", "Load", "Store", "Add", "Subt", "Input", "Output", "Halt", "Skipcond", "Jump", "Clear", "AddI", "JumpI", "LoadI", "StoreI"]
+instrucoes_requisitadas = []
+enderecos_acessados = []
+fim_de_leitura = False
 
-        elif bth(c[0]) == "1": k = "Load\n"
+entrada = ''  #Vai armazenar a entrada toda de dados
+entrada_tratada = ''  #Vai armazenar somente os dígitos binários que vieram na entrada original
 
-        elif bth(c[0]) == "D": k = "LoadI\n"
+# Realiza a leitura de toda a entrada de dados
+while not fim_de_leitura:
+    try:
+        entrada += input()
+    except EOFError:
+        fim_de_leitura = True
 
-        elif bth(c[0]) == "2": k = "Store\n"
+# Faz a seleção somente dos dígitos binários (0 e 1) que vieram na entrada
+for i in entrada:
+    if i == '0' or i == '1':
+        entrada_tratada += i
 
-        elif bth(c[0]) == "E": k = "StoreI\n"
+# Separa as instruções dos endereços acessados
+for i in range(0, len(entrada_tratada), 16):
+    instrucao_bin = entrada_tratada[i:i+4]
+    endereco_bin = entrada_tratada[i+4:i+16]
 
-        elif bth(c[0]) == "8": k = "Skipcond\n"
+    x = len(endereco_bin)
+    
+    # Guarda a instrução requisitada e o endereço acessado por essa instrução
+    if len(instrucao_bin) == 4 and len(endereco_bin) == 12 and int(instrucao_bin, 2) <= 14:
+        instrucoes_requisitadas.append(mnemonicos[int(instrucao_bin, 2)])
+        enderecos_acessados.append(int(endereco_bin, 2))
 
-        elif bth(c[0]) == "5": k = "Input\n"
+print("\nInstruções:\n")
+for i in instrucoes_requisitadas:
+    print(i)
+print()
 
-        elif bth(c[0]) == "6": k = "Output\n"
-
-        elif bth(c[0]) == "A": k = "Clear\n"
-
-        elif bth(c[0]) == "0": k = "JnS\n"
-
-        elif bth(c[0]) == "7": k = "Halt\n"
-
-        return k
-
-def marie_a(c):
-        l = int(c[1], 2)
-        if l == 0:
-                x = ''
-
-        else:
-                x = f'{l}\n'
-
-        return x
-
-def main():
-        s = 'Instruções:\n'
-        f = 'Endereços acessados:\n'
-
-        while True:
-                c = input().split()
-                if not c:
-                        break
-                s += marie_i(c)
-                f += marie_a(c)
-
-        print(f"{s}\n{f}")
-
-main()
+print("Endereços acessados:\n")
+for i in enderecos_acessados:
+    if i != 0:
+        print(i)
+        print()
